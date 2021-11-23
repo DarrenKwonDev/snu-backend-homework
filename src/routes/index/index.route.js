@@ -1,17 +1,17 @@
 import Router from "express";
-import IndexController from "@/controller/index.controller";
+import IndexHandler from "@/routes/index/index.handler";
 
 class IndexRoute {
   path = "/";
   router = Router();
-  indexController = new IndexController();
+  indexHandler = new IndexHandler();
 
   constructor() {
     this.initializeRoutes();
   }
 
   initializeRoutes() {
-    this.router.get(this.path, this.indexController.index);
+    this.router.get(this.path, this.indexHandler.index);
   }
 }
 

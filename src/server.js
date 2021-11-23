@@ -1,7 +1,7 @@
 import "dotenv/config";
 import App from "@/app.js";
 import validateEnv from "@/utils/validateEnv";
-import IndexRoute from "@/routes/index.route";
+import IndexRoute from "@/routes/index/index.route";
 
 validateEnv();
 
