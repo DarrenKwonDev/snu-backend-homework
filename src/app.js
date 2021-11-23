@@ -3,12 +3,12 @@ import morgan from "morgan";
 import cors from "cors";
 import hpp from "hpp";
 import helmet from "helmet";
+import mongoose from "mongoose";
 import { ENV } from "@/constants";
 import errorMiddleware from "@/middleware/error.middleware";
-import mongoose from "mongoose";
 
 class App {
-  constructor() {
+  constructor(routes) {
     this.app = express();
     this.port = process.env.PORT;
     this.env = process.env.NODE_ENV;
@@ -20,6 +20,7 @@ class App {
     // 순서 중요. DB를 처음에 배치. cors해결을 위해 미들웨어를 라우트 이전에 배치할 것.
     this.connectToDatabase();
     this.initializeMiddlewares();
+    this.initializeRoutes(routes);
     this.initializeErrorHandling();
   }
 
@@ -64,7 +65,12 @@ class App {
       .catch((err) => console.error(err));
   }
 
-  initializeRoutes() {}
+  initializeRoutes(routes) {
+    // 보통 여기에 API_VER 넣는데 여기서는 필요 없을 것 같아서 뺐어용
+    routes.forEach((route) => {
+      this.app.use(`/`, route.router);
+    });
+  }
 
   initializeErrorHandling() {
     this.app.use(errorMiddleware);
