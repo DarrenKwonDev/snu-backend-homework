@@ -5,6 +5,8 @@ import {
 } from "@/routes/index/index.util";
 import Users from "@/models/Users";
 import jwt from "jsonwebtoken";
+import Keys from "@/models/Keys";
+import Assets from "@/models/Assets";
 
 class IndexHandler {
   successStatus = 200;
@@ -56,10 +58,21 @@ class IndexHandler {
       const newUser = new Users({
         name,
         email,
-        token,
+      });
+
+      const newKeys = new Keys({
+        owner: newUser._id,
+        publicKey: token,
+        secretKey: process.env.JWT_SECRET,
+      });
+
+      const newAssets = new Assets({
+        owner: newUser._id,
       });
 
       newUser.save();
+      newKeys.save();
+      newAssets.save();
 
       // FIXME: 과제 요건 때문에 이렇게 하는 것이지 실제로는 scretKey를 노출하면 안된다!
       res.status(this.successStatus).json({

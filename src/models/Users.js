@@ -10,7 +10,8 @@ const userSchema = mongoose.Schema(
       unique: true,
     },
     token: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Keys",
     },
     assets: {
       type: mongoose.Schema.Types.ObjectId,
