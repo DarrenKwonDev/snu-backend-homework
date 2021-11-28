@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
       type: String,
       unique: true,
     },
-    token: {
+    keys: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Keys",
     },

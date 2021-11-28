@@ -100,18 +100,28 @@ class IndexHandler {
         throw new Error("user not existed");
       }
 
-      jwt.verify(existedUser.token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) throw new Error("invalid token");
-        decodedPayload = decoded;
-      });
+      const logedInUserKeys = await Keys.findOne({ owner: existedUser._id });
+
+      jwt.verify(
+        logedInUserKeys.publicKey,
+        process.env.JWT_SECRET,
+        (err, decoded) => {
+          if (err) throw new Error("invalid token");
+          decodedPayload = decoded;
+        }
+      );
 
       const isPasswordCorrect = decodedPayload.password === password;
       if (!isPasswordCorrect) {
         throw new Error("password wrong");
       }
 
+      // FIXME: scretKey를 이렇게 노출하면 원래 안된다!
       res.status(this.successStatus).json({
-        key: existedUser.token,
+        key: {
+          publicKey: logedInUserKeys.publicKey,
+          scretKey: logedInUserKeys.secretKey,
+        },
       });
     } catch (error) {
       next(error);
