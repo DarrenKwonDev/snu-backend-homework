@@ -11,7 +11,7 @@ class CoinsRoute {
   }
 
   initializeRoutes() {
-    this.router.get(this.path, this.coinsHandler.index);
+    this.router.get(`${this.path}`, this.coinsHandler.index);
   }
 }
 

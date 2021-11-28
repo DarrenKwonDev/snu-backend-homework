@@ -61,7 +61,11 @@ class IndexHandler {
 
       newUser.save();
 
-      res.status(this.successStatus).json({});
+      // FIXME: 과제 요건 때문에 이렇게 하는 것이지 실제로는 scretKey를 노출하면 안된다!
+      res.status(this.successStatus).json({
+        publicKey: token,
+        secretKey: process.env.JWT_SECRET,
+      });
     } catch (error) {
       next(error);
     }

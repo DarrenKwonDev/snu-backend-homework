@@ -1,8 +1,6 @@
 const ENV = Object.freeze({
-    DEVELOPMENT: 'development',
-    PRODUCTION: 'production',
-})
+  DEVELOPMENT: "development",
+  PRODUCTION: "production",
+});
 
-export {
-    ENV
-}
+export { ENV };

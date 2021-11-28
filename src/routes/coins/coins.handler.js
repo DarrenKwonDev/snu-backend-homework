@@ -1,9 +1,17 @@
+import CoinGecko from "coingecko-api";
+
 class CoinsHandler {
-  status = 200;
+  successStatus = 200;
+
+  constructor() {
+    this.CoinGeckoClient = new CoinGecko();
+  }
 
   index = (req, res, next) => {
     try {
-      res.status(200).send(`welcome. this is snu-coin-backend homework ☀️`);
+      res.status(this.successStatus).json({
+        coins: ["btc", "xrp", "doge", "eth"],
+      });
     } catch (error) {
       next(error);
     }

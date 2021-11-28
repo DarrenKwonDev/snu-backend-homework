@@ -20,6 +20,33 @@ https://github.com/snuwebprogramming-21-2/final_individual_task
 - [ ] /coins/:coin_name/buy
 - [ ] /coins/:coin_name/sell
 
+## COIN
+
+```
+const COIN_GECKO = {
+  BTC: {
+    id: "bitcoin",
+    symbol: "btc",
+    name: "Bitcoin",
+  },
+  XRP: {
+    id: "ripple",
+    symbol: "xrp",
+    name: "XRP",
+  },
+  DOGE: {
+    id: "binance-peg-dogecoin",
+    symbol: "doge",
+    name: "Binance-Peg Dogecoin",
+  },
+  ETH: {
+    id: "ethereum",
+    symbol: "eth",
+    name: "Ethereum",
+  },
+};
+```
+
 ## 실행 방법
 
 ### node 16
