@@ -9,6 +9,9 @@ const userSchema = mongoose.Schema(
       type: String,
       unique: true,
     },
+    token: {
+      type: String,
+    },
     assets: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Assets",

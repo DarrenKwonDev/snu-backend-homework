@@ -18,6 +18,7 @@ class IndexHandler {
   };
 
   register = async (req, res, next) => {
+    console.log("hit");
     try {
       const { name, email, password } = req.body;
 
@@ -49,20 +50,50 @@ class IndexHandler {
         throw new Error("user already existed");
       }
 
-      const token = jwt.sign({ email: email }, process.env.JWT_SECRET, {
-        expiresIn: "7d",
-      });
+      const token = jwt.sign({ password }, process.env.JWT_SECRET);
 
       const newUser = new Users({
         name,
         email,
+        token,
       });
 
       newUser.save();
 
+      res.status(200).json({});
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  login = async (req, res, next) => {
+    let decodedPayload = {};
+
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        throw new Error("missing required fields");
+      }
+
+      const existedUser = await Users.findOne({ email });
+
+      if (!existedUser) {
+        throw new Error("user not existed");
+      }
+
+      jwt.verify(existedUser.token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) throw new Error("invalid token");
+        decodedPayload = decoded;
+      });
+
+      const isPasswordCorrect = decodedPayload.password === password;
+      if (!isPasswordCorrect) {
+        throw new Error("password wrong");
+      }
+
       res.status(200).json({
-        success: true,
-        token,
+        key: existedUser.token,
       });
     } catch (error) {
       next(error);
