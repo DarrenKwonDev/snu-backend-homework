@@ -5,8 +5,8 @@ const validateEnv = () => {
     NODE_ENV: str({ choices: ["development", "production"] }),
     PORT: port(),
     DB_ENDPOINT: str(),
-    DB_USERNAME: str(),
-    DB_PASSWORD: num(),
+    // DB_USERNAME: str(),
+    // DB_PASSWORD: num(),
     DB_PORT: num(),
   });
 };

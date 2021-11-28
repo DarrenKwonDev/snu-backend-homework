@@ -12,6 +12,7 @@ class IndexRoute {
 
   initializeRoutes() {
     this.router.get(this.path, this.indexHandler.index);
+    this.router.post(this.path, this.indexHandler.register);
   }
 }
 

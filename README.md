@@ -6,6 +6,8 @@
 - 환경 변수 검증을 했습니다.
 - 현재(2021년 11월 24일) 기준 LTS인 16버전의 node를 사용하도록 .nvcrc를 작성했습니다.
 - babel-plugin-module-resolver를 통해서 절대 경로를 사용할 수 있도록 만들었습니다.
+- mongoDB 접속 id와 pw는 root, 1234입니다.
+-
 
 ## 과제 요구 사항
 
