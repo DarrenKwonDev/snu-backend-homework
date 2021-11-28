@@ -14,7 +14,7 @@ https://github.com/snuwebprogramming-21-2/final_individual_task
 
 - [x] /register
 - [x] /login
-- [ ] /coins
+- [x] /coins
 - [ ] /assets
 - [ ] /coins/:coin_name
 - [ ] /coins/:coin_name/buy
