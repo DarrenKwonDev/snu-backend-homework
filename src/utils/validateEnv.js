@@ -8,6 +8,7 @@ const validateEnv = () => {
     // DB_USERNAME: str(),
     // DB_PASSWORD: num(),
     DB_PORT: num(),
+    JWT_SECRET: str(),
   });
 };
 
