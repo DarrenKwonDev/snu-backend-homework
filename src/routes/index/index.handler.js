@@ -7,11 +7,13 @@ import Users from "@/models/Users";
 import jwt from "jsonwebtoken";
 
 class IndexHandler {
-  status = 200;
+  successStatus = 200;
 
   index = (req, res, next) => {
     try {
-      res.status(200).json(`welcome. this is snu-coin-backend homework ☀️`);
+      res
+        .status(this.successStatus)
+        .json(`welcome. this is snu-coin-backend homework ☀️`);
     } catch (error) {
       next(error);
     }
@@ -59,14 +61,14 @@ class IndexHandler {
 
       newUser.save();
 
-      res.status(200).json({});
+      res.status(this.successStatus).json({});
     } catch (error) {
       next(error);
     }
   };
 
   login = async (req, res, next) => {
-    let decodedPayload = {};
+    let decodedPayload;
 
     try {
       const { email, password } = req.body;
@@ -91,7 +93,7 @@ class IndexHandler {
         throw new Error("password wrong");
       }
 
-      res.status(200).json({
+      res.status(this.successStatus).json({
         key: existedUser.token,
       });
     } catch (error) {
