@@ -18,7 +18,6 @@ class IndexHandler {
   };
 
   register = async (req, res, next) => {
-    console.log("hit");
     try {
       const { name, email, password } = req.body;
 
