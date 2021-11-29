@@ -1,4 +1,5 @@
 import {
+  getAssetMoreThanZero,
   validateEmail,
   validateName,
   validatePassword,
@@ -53,7 +54,9 @@ class IndexHandler {
         throw new Error("user already existed");
       }
 
-      const token = jwt.sign({ password }, process.env.JWT_SECRET);
+      const token = jwt.sign({ password, email }, process.env.JWT_SECRET, {
+        expiresIn: 1000 * 60 * 5,
+      });
 
       const newUser = new Users({
         name,
@@ -123,6 +126,29 @@ class IndexHandler {
           scretKey: logedInUserKeys.secretKey,
         },
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  assets = async (req, res, next) => {
+    let populatedUser;
+
+    try {
+      const existedUser = await Users.findOne({ email: req.email });
+      const userAssets = await Assets.findOne(
+        { owner: existedUser._id },
+        null,
+        { projection: { _id: 0, dollar: 1, btc: 1, eth: 1, xrp: 1, doge: 1 } }
+      );
+
+      const assetObject = userAssets.toObject();
+
+      const largerThanZero = Object.entries(assetObject)
+        .filter(([_, v]) => v > 0)
+        .reduce((acc, cur) => ({ ...acc, [cur[0]]: cur[1] }), {});
+
+      return res.status(this.successStatus).json(largerThanZero);
     } catch (error) {
       next(error);
     }

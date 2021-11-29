@@ -22,3 +22,19 @@ export const validatePassword = (password) => {
     password.length <= 16
   );
 };
+
+const filterObject = (obj, filter, filterValue) =>
+  Object.keys(obj).reduce(
+    (acc, val) =>
+      obj[val][filter] === filterValue
+        ? acc
+        : {
+            ...acc,
+            [val]: obj[val],
+          },
+    {}
+  );
+
+export const getAssetMoreThanZero = (assets) => {
+  return Object.entries(assets).filter(([key, value]) => value > 0);
+};
