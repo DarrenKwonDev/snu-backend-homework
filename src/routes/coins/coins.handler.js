@@ -30,7 +30,17 @@ class CoinsHandler {
       const targetCoin = coinNameToCoinGeckoId[coin_name];
       const data = await this.CoinGeckoClient.coins.fetch(targetCoin);
 
-      return res.status(this.successStatus).json(data);
+      if (!data.success || data.code >= 400) {
+        throw new Error("Coin fetching failed");
+      }
+
+      const {
+        market_data: {
+          current_price: { krw },
+        },
+      } = data.data;
+
+      return res.status(this.successStatus).json({ price: Math.round(krw) });
     } catch (error) {
       next(error);
     }
