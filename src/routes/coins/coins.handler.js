@@ -153,8 +153,6 @@ class CoinsHandler {
       userAssets[coin_name] -= quantity;
       await userAssets.save();
 
-      console.log(userAssets);
-
       session.commitTransaction();
       session.endSession();
 

@@ -16,8 +16,7 @@ class IndexRoute {
     this.router.post(`${this.path}/register`, this.indexHandler.register);
     this.router.post(`${this.path}/login`, this.indexHandler.login);
 
-    // FIXME: user athentication이 필요한데 GET이어야할 이유를 모르겠습니다. body에 토큰을 담아 넘기는게 일반적이므로 POST여야 맞는 것 같아요
-    this.router.post(
+    this.router.get(
       `${this.path}/assets`,
       authCheckMiddleware,
       this.indexHandler.assets
