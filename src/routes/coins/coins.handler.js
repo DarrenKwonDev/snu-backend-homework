@@ -143,15 +143,17 @@ class CoinsHandler {
 
       const user = req.user;
       const userAssets = await Assets.findOne({ owner: user._id });
-      const requiredUsd = coinValue * quantity;
+      const coinValueAsDollar = coinValue * quantity;
 
-      if (userAssets.dollar < requiredUsd) {
-        throw new Error("Not enough money");
+      if (userAssets[coin_name] < quantity) {
+        throw new Error("Not enough coins");
       }
 
-      userAssets.dollar -= requiredUsd;
-      userAssets[coin_name] += quantity;
+      userAssets.dollar += coinValueAsDollar;
+      userAssets[coin_name] -= quantity;
       await userAssets.save();
+
+      console.log(userAssets);
 
       session.commitTransaction();
       session.endSession();
