@@ -6,3 +6,8 @@ export const coinNameToCoinGeckoId = {
   solana: "solana",
   polkadot: "binance-peg-polkadot",
 };
+
+export const quantityDecimalPointsCheck = (value) => {
+  const regex = /^\d+(\.\d{1,4})?$/;
+  return regex.test(value);
+};

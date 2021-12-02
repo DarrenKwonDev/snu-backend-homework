@@ -1,5 +1,6 @@
 import Router from "express";
 import CoinsHandler from "@/routes/coins/coins.handler";
+import authCheckMiddleware from "@/middleware/authCheck.middleware";
 
 class CoinsRoute {
   path = "/coins";
@@ -16,6 +17,16 @@ class CoinsRoute {
     this.router.get(
       `${this.path}/:coin_name`,
       this.coinsHandler.coinMarketValue
+    );
+    this.router.post(
+      `${this.path}/:coin_name/buy`,
+      authCheckMiddleware,
+      this.coinsHandler.buyCoin
+    );
+    this.router.post(
+      `${this.path}/:coin_name/sell`,
+      authCheckMiddleware,
+      this.coinsHandler.sellCoin
     );
   }
 }

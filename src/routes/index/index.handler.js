@@ -73,9 +73,9 @@ class IndexHandler {
         owner: newUser._id,
       });
 
-      newUser.save();
-      newKeys.save();
-      newAssets.save();
+      await newUser.save();
+      await newKeys.save();
+      await newAssets.save();
 
       // FIXME: 과제 요건 때문에 이렇게 하는 것이지 실제로는 scretKey를 노출하면 안된다!
       res.status(this.successStatus).json({
@@ -135,7 +135,7 @@ class IndexHandler {
     let populatedUser;
 
     try {
-      const existedUser = await Users.findOne({ email: req.email });
+      const existedUser = req.user;
       const userAssets = await Assets.findOne(
         { owner: existedUser._id },
         null,

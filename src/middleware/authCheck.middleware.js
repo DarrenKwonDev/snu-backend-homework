@@ -1,6 +1,7 @@
+import Users from "@/models/Users";
 import jwt from "jsonwebtoken";
 
-const authCheckMiddleware = (req, res, next) => {
+const authCheckMiddleware = async (req, res, next) => {
   let decodedPayload;
   try {
     const { authorization: token } = req.headers;
@@ -18,7 +19,9 @@ const authCheckMiddleware = (req, res, next) => {
       throw new Error("token is not valid");
     }
 
-    req.email = decodedPayload.email;
+    const user = await Users.findOne({ email: decodedPayload.email });
+
+    req.user = user;
     next();
   } catch (error) {
     next(error);

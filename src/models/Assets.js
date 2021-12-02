@@ -9,27 +9,27 @@ const assetsSchema = mongoose.Schema({
     type: Number,
     default: 10000,
   },
-  btc: {
+  bitcoin: {
     type: Number,
     default: 0,
   },
-  eth: {
+  ethereum: {
     type: Number,
     default: 0,
   },
-  xrp: {
+  ripple: {
     type: Number,
     default: 0,
   },
-  doge: {
+  dogecoin: {
     type: Number,
     default: 0,
   },
-  sol: {
+  solana: {
     type: Number,
     default: 0,
   },
-  dot: {
+  polkadot: {
     type: Number,
     default: 0,
   },

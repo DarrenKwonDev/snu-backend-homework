@@ -1,6 +1,11 @@
 import { availableCoinArray } from "@/constants";
-import { coinNameToCoinGeckoId } from "@/routes/coins/coins.util";
+import Assets from "@/models/Assets";
+import {
+  coinNameToCoinGeckoId,
+  quantityDecimalPointsCheck,
+} from "@/routes/coins/coins.util";
 import CoinGecko from "coingecko-api";
+import mongoose from "mongoose";
 
 class CoinsHandler {
   successStatus = 200;
@@ -36,11 +41,11 @@ class CoinsHandler {
 
       const {
         market_data: {
-          current_price: { krw },
+          current_price: { usd },
         },
       } = data.data;
 
-      return res.status(this.successStatus).json({ price: Math.round(krw) });
+      return res.status(this.successStatus).json({ price: usd });
     } catch (error) {
       next(error);
     }
@@ -49,47 +54,115 @@ class CoinsHandler {
   buyCoin = async (req, res, next) => {
     try {
       const { coin_name } = req.params;
+      let { quantity } = req.body;
+      quantity = parseFloat(quantity);
+
       if (!availableCoinArray.includes(coin_name)) {
         throw new Error("Coin not found");
       }
-      // https://darrengwon.tistory.com/660
 
-      session = db.getMongo().startSession();
+      if (!quantityDecimalPointsCheck(quantity)) {
+        throw new Error("quantity decimal points are more than 4");
+      }
+
+      const targetCoin = coinNameToCoinGeckoId[coin_name];
+      const data = await this.CoinGeckoClient.coins.fetch(targetCoin);
+
+      if (!data.success || data.code >= 400) {
+        throw new Error("Coin fetching failed");
+      }
+
+      const {
+        market_data: {
+          current_price: { usd: coinValue },
+        },
+      } = data.data;
+
+      const session = await mongoose.startSession();
       session.startTransaction({
         readConcern: { level: "snapshot" },
         writeConcern: { w: "majority" },
       });
 
-      // TODO: coin 구매
-      // TODO: 유저의 asset 정보에서 돈을 제거하고 코인을 추가하면 됨
-      // 근거는 현재 gecko api의 가격
+      const user = req.user;
+      const userAssets = await Assets.findOne({ owner: user._id });
+      const requiredUsd = coinValue * quantity;
+
+      if (userAssets.dollar < requiredUsd) {
+        throw new Error("Not enough money");
+      }
+
+      userAssets.dollar -= requiredUsd;
+      userAssets[coin_name] += quantity;
+      await userAssets.save();
 
       session.commitTransaction();
       session.endSession();
+
+      return res.status(this.successStatus).json({
+        price: coinValue,
+        quantity,
+      });
     } catch (error) {
       next(error);
     }
   };
 
   sellCoin = async (req, res, next) => {
-    const { coin_name } = req.params;
-    if (!availableCoinArray.includes(coin_name)) {
-      throw new Error("Coin not found");
+    try {
+      const { coin_name } = req.params;
+      let { quantity } = req.body;
+      quantity = parseFloat(quantity);
+
+      if (!availableCoinArray.includes(coin_name)) {
+        throw new Error("Coin not found");
+      }
+
+      if (!quantityDecimalPointsCheck(quantity)) {
+        throw new Error("quantity decimal points are more than 4");
+      }
+
+      const targetCoin = coinNameToCoinGeckoId[coin_name];
+      const data = await this.CoinGeckoClient.coins.fetch(targetCoin);
+
+      if (!data.success || data.code >= 400) {
+        throw new Error("Coin fetching failed");
+      }
+
+      const {
+        market_data: {
+          current_price: { usd: coinValue },
+        },
+      } = data.data;
+
+      const session = await mongoose.startSession();
+      session.startTransaction({
+        readConcern: { level: "snapshot" },
+        writeConcern: { w: "majority" },
+      });
+
+      const user = req.user;
+      const userAssets = await Assets.findOne({ owner: user._id });
+      const requiredUsd = coinValue * quantity;
+
+      if (userAssets.dollar < requiredUsd) {
+        throw new Error("Not enough money");
+      }
+
+      userAssets.dollar -= requiredUsd;
+      userAssets[coin_name] += quantity;
+      await userAssets.save();
+
+      session.commitTransaction();
+      session.endSession();
+
+      return res.status(this.successStatus).json({
+        price: coinValue,
+        quantity,
+      });
+    } catch (error) {
+      next(error);
     }
-    // https://darrengwon.tistory.com/660
-
-    session = db.getMongo().startSession();
-    session.startTransaction({
-      readConcern: { level: "snapshot" },
-      writeConcern: { w: "majority" },
-    });
-
-    // TODO: coin 판매
-    // TODO: 유저의 asset 정보에서 코인을 제거하고 돈을 추가한다.
-    // 근거는 현재 gecko api의 가격
-
-    session.commitTransaction();
-    session.endSession();
   };
 }
 
