@@ -3,4 +3,6 @@ export const coinNameToCoinGeckoId = {
   eth: "ethereum",
   xrp: "ripple",
   doge: "binance-peg-dogecoin",
+  sol: "solana",
+  dot: "binance-peg-polkadot",
 };

@@ -25,6 +25,14 @@ const assetsSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  sol: {
+    type: Number,
+    default: 0,
+  },
+  dot: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Assets = mongoose.model("Assets", assetsSchema);

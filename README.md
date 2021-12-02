@@ -45,6 +45,16 @@ const COIN_GECKO = {
     symbol: "eth",
     name: "Ethereum",
   },
+  SOL: {
+    "id": "solana",
+    "symbol": "sol",
+    "name": "Solana"
+  },
+  DOT: {
+    "id": "binance-peg-polkadot",
+    "symbol": "dot",
+    "name": "Binance-Peg Polkadot"
+  },
 };
 ```
 
