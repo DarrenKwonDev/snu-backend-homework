@@ -1,8 +1,8 @@
 export const coinNameToCoinGeckoId = {
-  btc: "bitcoin",
-  eth: "ethereum",
-  xrp: "ripple",
-  doge: "binance-peg-dogecoin",
-  sol: "solana",
-  dot: "binance-peg-polkadot",
+  bitcoin: "bitcoin",
+  ethereum: "ethereum",
+  ripple: "ripple",
+  dogecoin: "binance-peg-dogecoin",
+  solana: "solana",
+  polkadot: "binance-peg-polkadot",
 };

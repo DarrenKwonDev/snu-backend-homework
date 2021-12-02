@@ -3,6 +3,13 @@ const ENV = Object.freeze({
   PRODUCTION: "production",
 });
 
-const availableCoinArray = ["btc", "xrp", "doge", "eth", "sol", "dot"];
+const availableCoinArray = [
+  "bitcoin",
+  "ripple",
+  "dogecoin",
+  "ethereum",
+  "solana",
+  "polkadot",
+];
 
 export { ENV, availableCoinArray };
