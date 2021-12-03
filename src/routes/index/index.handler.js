@@ -132,14 +132,23 @@ class IndexHandler {
   };
 
   assets = async (req, res, next) => {
-    let populatedUser;
-
     try {
       const existedUser = req.user;
       const userAssets = await Assets.findOne(
         { owner: existedUser._id },
         null,
-        { projection: { _id: 0, dollar: 1, btc: 1, eth: 1, xrp: 1, doge: 1 } }
+        {
+          projection: {
+            _id: 0,
+            dollar: 1,
+            bitcoin: 1,
+            ethereum: 1,
+            ripple: 1,
+            dogecoin: 1,
+            solana: 1,
+            polkadot: 1,
+          },
+        }
       );
 
       const assetObject = userAssets.toObject();

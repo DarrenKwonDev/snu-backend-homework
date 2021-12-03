@@ -65,14 +65,15 @@ class CoinsHandler {
       if (!data.success || data.code >= 400) {
         throw new Error("Coin fetching failed");
       }
-      const user = req.user;
-      const userAssets = await Assets.findOne({ owner: user._id });
 
       const {
         market_data: {
           current_price: { usd: coinValue },
         },
       } = data.data;
+
+      const user = req.user;
+      const userAssets = await Assets.findOne({ owner: user._id });
 
       const session = await mongoose.startSession();
       session.startTransaction({
@@ -86,11 +87,26 @@ class CoinsHandler {
         }
 
         const maxiumCoinQuantity = Math.floor(userAssets.dollar / coinValue);
+
+        console.log("maxiumCoinQuantity", maxiumCoinQuantity);
+
+        if (!Boolean(maxiumCoinQuantity)) {
+          throw new Error("You don't have enough money");
+        }
+
         const requiredUsd = coinValue * maxiumCoinQuantity;
 
         userAssets.dollar -= requiredUsd;
         userAssets[coin_name] += maxiumCoinQuantity;
         await userAssets.save();
+
+        session.commitTransaction();
+        session.endSession();
+
+        return res.status(this.successStatus).json({
+          price: coinValue,
+          quantity: maxiumCoinQuantity,
+        });
       }
 
       if (!Boolean(all)) {
@@ -109,15 +125,15 @@ class CoinsHandler {
         userAssets.dollar -= requiredUsd;
         userAssets[coin_name] += quantity;
         await userAssets.save();
+
+        session.commitTransaction();
+        session.endSession();
+
+        return res.status(this.successStatus).json({
+          price: coinValue,
+          quantity,
+        });
       }
-
-      session.commitTransaction();
-      session.endSession();
-
-      return res.status(this.successStatus).json({
-        price: coinValue,
-        quantity: maxiumCoinQuantity ? maxiumCoinQuantity : quantity,
-      });
     } catch (error) {
       next(error);
     }
@@ -127,19 +143,13 @@ class CoinsHandler {
     try {
       const { coin_name } = req.params;
       let { quantity, all } = req.body;
-      quantity = parseFloat(quantity);
 
       if (!availableCoinArray.includes(coin_name)) {
         throw new Error("Coin not found");
       }
 
-      if (!quantityDecimalPointsCheck(quantity)) {
-        throw new Error("quantity decimal points are more than 4");
-      }
-
       const targetCoin = coinNameToCoinGeckoId[coin_name];
       const data = await this.CoinGeckoClient.coins.fetch(targetCoin);
-
       if (!data.success || data.code >= 400) {
         throw new Error("Coin fetching failed");
       }
@@ -150,31 +160,68 @@ class CoinsHandler {
         },
       } = data.data;
 
+      const user = req.user;
+      const userAssets = await Assets.findOne({ owner: user._id });
+
       const session = await mongoose.startSession();
       session.startTransaction({
         readConcern: { level: "snapshot" },
         writeConcern: { w: "majority" },
       });
 
-      const user = req.user;
-      const userAssets = await Assets.findOne({ owner: user._id });
-      const coinValueAsDollar = coinValue * quantity;
+      if (Boolean(all)) {
+        if (quantity) {
+          throw new Error("You can't buy sell coins with quantity");
+        }
 
-      if (userAssets[coin_name] < quantity) {
-        throw new Error("Not enough coins");
+        const maxiumCoinQuantity = userAssets[coin_name];
+
+        console.log("maxiumCoinQuantity", maxiumCoinQuantity);
+
+        if (!Boolean(maxiumCoinQuantity)) {
+          throw new Error("You don't have enough coins");
+        }
+
+        const coinValueAsDollar = coinValue * maxiumCoinQuantity;
+
+        userAssets.dollar += coinValueAsDollar;
+        userAssets[coin_name] -= maxiumCoinQuantity;
+        await userAssets.save();
+
+        session.commitTransaction();
+        session.endSession();
+
+        return res.status(this.successStatus).json({
+          price: coinValue,
+          quantity: maxiumCoinQuantity,
+        });
       }
 
-      userAssets.dollar += coinValueAsDollar;
-      userAssets[coin_name] -= quantity;
-      await userAssets.save();
+      if (!Boolean(all)) {
+        quantity = parseFloat(quantity);
 
-      session.commitTransaction();
-      session.endSession();
+        if (!quantityDecimalPointsCheck(quantity)) {
+          throw new Error("quantity decimal points are more than 4");
+        }
 
-      return res.status(this.successStatus).json({
-        price: coinValue,
-        quantity,
-      });
+        const coinValueAsDollar = coinValue * quantity;
+
+        if (userAssets[coin_name] < quantity) {
+          throw new Error("Not enough coins");
+        }
+
+        userAssets.dollar += coinValueAsDollar;
+        userAssets[coin_name] -= quantity;
+        await userAssets.save();
+
+        session.commitTransaction();
+        session.endSession();
+
+        return res.status(this.successStatus).json({
+          price: coinValue,
+          quantity,
+        });
+      }
     } catch (error) {
       next(error);
     }
