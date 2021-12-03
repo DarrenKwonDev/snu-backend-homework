@@ -119,3 +119,5 @@ dist
 
 db
 package-lock.json
+
+.DS_Store
