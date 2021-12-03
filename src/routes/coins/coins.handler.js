@@ -54,23 +54,19 @@ class CoinsHandler {
   buyCoin = async (req, res, next) => {
     try {
       const { coin_name } = req.params;
-      let { quantity } = req.body;
-      quantity = parseFloat(quantity);
+      let { quantity, all } = req.body;
 
       if (!availableCoinArray.includes(coin_name)) {
         throw new Error("Coin not found");
       }
 
-      if (!quantityDecimalPointsCheck(quantity)) {
-        throw new Error("quantity decimal points are more than 4");
-      }
-
       const targetCoin = coinNameToCoinGeckoId[coin_name];
       const data = await this.CoinGeckoClient.coins.fetch(targetCoin);
-
       if (!data.success || data.code >= 400) {
         throw new Error("Coin fetching failed");
       }
+      const user = req.user;
+      const userAssets = await Assets.findOne({ owner: user._id });
 
       const {
         market_data: {
@@ -84,24 +80,43 @@ class CoinsHandler {
         writeConcern: { w: "majority" },
       });
 
-      const user = req.user;
-      const userAssets = await Assets.findOne({ owner: user._id });
-      const requiredUsd = coinValue * quantity;
+      if (Boolean(all)) {
+        if (quantity) {
+          throw new Error("You can't buy all coins with quantity");
+        }
 
-      if (userAssets.dollar < requiredUsd) {
-        throw new Error("Not enough money");
+        const maxiumCoinQuantity = Math.floor(userAssets.dollar / coinValue);
+        const requiredUsd = coinValue * maxiumCoinQuantity;
+
+        userAssets.dollar -= requiredUsd;
+        userAssets[coin_name] += maxiumCoinQuantity;
+        await userAssets.save();
       }
 
-      userAssets.dollar -= requiredUsd;
-      userAssets[coin_name] += quantity;
-      await userAssets.save();
+      if (!Boolean(all)) {
+        quantity = parseFloat(quantity);
+
+        if (!quantityDecimalPointsCheck(quantity)) {
+          throw new Error("quantity decimal points are more than 4");
+        }
+
+        const requiredUsd = coinValue * quantity;
+
+        if (userAssets.dollar < requiredUsd) {
+          throw new Error("Not enough money");
+        }
+
+        userAssets.dollar -= requiredUsd;
+        userAssets[coin_name] += quantity;
+        await userAssets.save();
+      }
 
       session.commitTransaction();
       session.endSession();
 
       return res.status(this.successStatus).json({
         price: coinValue,
-        quantity,
+        quantity: maxiumCoinQuantity ? maxiumCoinQuantity : quantity,
       });
     } catch (error) {
       next(error);
@@ -111,7 +126,7 @@ class CoinsHandler {
   sellCoin = async (req, res, next) => {
     try {
       const { coin_name } = req.params;
-      let { quantity } = req.body;
+      let { quantity, all } = req.body;
       quantity = parseFloat(quantity);
 
       if (!availableCoinArray.includes(coin_name)) {
