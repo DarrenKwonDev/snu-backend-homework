@@ -74,7 +74,8 @@ nvm use
 
 ### 의존성 설치
 
-npm i
+npm ci
+(package-lock.json을 따라 의존성 트리를 존중하며 설치)
 
 ### 구동
 
