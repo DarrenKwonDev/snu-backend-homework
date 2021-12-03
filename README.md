@@ -7,7 +7,6 @@
 - 현재(2021년 11월 24일) 기준 LTS인 16버전의 node를 사용하도록 .nvcrc를 작성했습니다.
 - babel-plugin-module-resolver를 통해서 절대 경로를 사용할 수 있도록 만들었습니다.
 - 쉽게 사용할 수 있도록 mongoDB 접속 id와 pw를 설정하지 않았습니다.
-- transaction을 사용하였습니다.
 
 ## 과제 요구 사항
 
@@ -18,8 +17,8 @@ https://github.com/snuwebprogramming-21-2/final_individual_task
 - [x] /coins
 - [x] /assets
 - [x] /coins/:coin_name
-- [ ] /coins/:coin_name/buy
-- [ ] /coins/:coin_name/sell
+- [x] /coins/:coin_name/buy -> body에 all: true를 전달하여 전량 구매 가능
+- [x] /coins/:coin_name/sell -> body에 all: true를 전달하여 전량 매도 가능
 
 ## COIN
 
